@@ -1,0 +1,71 @@
+{% extends 'flatpages/default.html' %}
+
+{% load censor %}
+
+{% block title %}
+News
+{% endblock title %}
+
+{# Импортируем модуль с нашим тегом #}
+{% load custom_tags %}
+
+
+{% block content %}
+
+
+    {% load i18n %}
+
+    <h2>{% trans "All" %} {% trans "News" %}</h2>
+    <h4>{% trans "Today" %} {{ time_now|date:'d M Y' }}</h4>
+    
+    <hr>
+
+    {% if news %}
+    
+        <table>
+            <tr>                
+                <td>Название</td>
+                <td>Дата публикации</td>
+                <td>Текст статьи</td>
+            </tr>
+
+            {% for new in news %}
+            <tr>
+                <td>{{ new.title|censor }}</td>
+                <td>{{ new.time_in|date:'d M Y' }}</td>
+                <td>{{ new.content|truncatechars:30|censor }}</td>  
+            </tr>
+            {% endfor %}      
+            
+        </table>
+
+    {% else %}
+        <h2>No News !</h2>
+
+    {% endif %}
+
+    {# Добавляем пагинацию на страницу #}
+
+    {# Информация о предыдущих страницах #}
+    {% if page_obj.has_previous %}
+    <a href="?{% url_replace page=1 %}">1</a>
+        {% if page_obj.previous_page_number != 1 %}
+            ...
+            <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+        {% endif %}
+    {% endif %}
+ 
+    {# Информация о текущей странице #}
+    {{ page_obj.number }}
+ 
+    {# Информация о следующих страницах #}
+    {% if page_obj.has_next %}
+        <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+        {% if paginator.num_pages != page_obj.next_page_number %}
+            ...
+            <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+        {% endif %}
+    {% endif %}
+
+{% endblock content %}
+
